@@ -1,4 +1,4 @@
-package coadjuteFlow.functions
+package coadjute.functions
 
 import net.corda.core.flows.FlowLogic
 import net.corda.core.identity.Party

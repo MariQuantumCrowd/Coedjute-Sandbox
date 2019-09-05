@@ -1,18 +1,16 @@
-package coadjuteFlow.Organizational
+package coadjute.flows
 
-import coadjuteFlow.functions.*
+import coadjute.functions.*
 import coadjute.states.*
 import co.paralleluniverse.fibers.Suspendable
-import coadjute.contracts.TemplateContract
-import coadjute.contracts.TemplateContract.Companion.ORG_ID
+import coadjute.contracts.OrganizationContract
+import coadjute.contracts.OrganizationContract.Companion.ORG_ID
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
-import java.time.Instant
 
 
 @InitiatingFlow
@@ -50,9 +48,9 @@ class RegisterUserFlow(private val Name: String,
     }
 
 
-    private fun outputState(): UserListState {
+    private fun outputState(): UserState {
 
-        return UserListState(
+        return UserState(
                  name = Name,
                  emailAddress = Email,
                  role =  Role,
@@ -67,7 +65,7 @@ class RegisterUserFlow(private val Name: String,
 
     private fun transaction(): TransactionBuilder {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val registerCommand = Command(TemplateContract.Commands.Action(), outputState().participants.map { it.owningKey })
+        val registerCommand = Command(OrganizationContract.Commands.Action(), outputState().participants.map { it.owningKey })
         val builder = TransactionBuilder(notary)
         builder.addOutputState(outputState(), ORG_ID)
         builder.addCommand(registerCommand)

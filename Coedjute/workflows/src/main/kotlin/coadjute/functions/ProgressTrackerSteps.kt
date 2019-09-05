@@ -1,4 +1,4 @@
-package coadjuteFlow.functions
+package coadjute.functions
 
 import net.corda.core.flows.CollectSignaturesFlow
 import net.corda.core.flows.FinalityFlow

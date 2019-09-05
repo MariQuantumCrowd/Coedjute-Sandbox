@@ -1,23 +1,20 @@
-package coadjuteFlow.Organizational
+package coadjute.flows
 
-import coadjuteFlow.functions.*
+import coadjute.functions.*
 import coadjute.states.*
 import co.paralleluniverse.fibers.Suspendable
-import coadjute.contracts.TemplateContract
-import coadjute.contracts.TemplateContract.Companion.ORG_ID
+import coadjute.contracts.OrganizationContract
+import coadjute.contracts.OrganizationContract.Companion.ORG_ID
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
-import net.corda.core.identity.Party
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import java.time.Instant
 
-
-@InitiatingFlow
 @StartableByRPC
-class RegisterOrganizationFlow(private val organizationName: String):FlowFunctions(){
+class RegisterOrganizationFlow(private val organizationName: String): FlowFunctions()
+{
     @Suspendable
     override fun call(): SignedTransaction {
         print("                                                  \n")
@@ -32,13 +29,9 @@ class RegisterOrganizationFlow(private val organizationName: String):FlowFunctio
 
         progressTracker.currentStep = SIGNING
         val signedTransaction = verifyAndSign(transaction)
-        val session = (outputState().participants - ourIdentity).map { initiateFlow(it) }
-
-        progressTracker.currentStep = COLLECTING
-        val transactionSignedByAllParties = collectSignature(signedTransaction, session)
 
         progressTracker.currentStep = FINALIZING
-        return subFlow(FinalityFlow(transactionSignedByAllParties, session)).also {
+        return subFlow(FinalityFlow(signedTransaction, listOf())).also {
             subFlow(BroadcastFlow(it))
         }
     }
@@ -48,7 +41,7 @@ class RegisterOrganizationFlow(private val organizationName: String):FlowFunctio
         return OrganizationState(
                 organizationName = organizationName,
                 registerDate = Instant.now().toString(),
-                userList = null,
+                user = null,
                 linearId = UniqueIdentifier(),
                 participants = listOf(ourIdentity)
         )
@@ -56,25 +49,11 @@ class RegisterOrganizationFlow(private val organizationName: String):FlowFunctio
 
     private fun transaction(): TransactionBuilder {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val registerCommand = Command(TemplateContract.Commands.Action(), outputState().participants.map { it.owningKey })
+        val registerCommand = Command(OrganizationContract.Commands.Register(), outputState().participants.map { it.owningKey })
         val builder = TransactionBuilder(notary)
         builder.addOutputState(outputState(), ORG_ID)
         builder.addCommand(registerCommand)
         return builder
     }
 
-}
-
-@InitiatedBy(RegisterOrganizationFlow::class)
-class RegisterOrganizationFlowResponder(val flowSession: FlowSession) : FlowLogic<SignedTransaction>() {
-
-    @Suspendable
-    override fun call(): SignedTransaction {
-        val signTransactionFlow = object : SignTransactionFlow(flowSession) {
-            override fun checkTransaction(stx: SignedTransaction) = requireThat {
-            }
-        }
-        val signedTransaction = subFlow(signTransactionFlow)
-        return subFlow(ReceiveFinalityFlow(otherSideSession = flowSession, expectedTxId = signedTransaction.id))
-    }
 }

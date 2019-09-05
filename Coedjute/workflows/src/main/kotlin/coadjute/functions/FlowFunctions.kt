@@ -1,4 +1,4 @@
-package coadjuteFlow.functions
+package coadjute.functions
 
 import co.paralleluniverse.fibers.Suspendable
 import net.corda.core.contracts.UniqueIdentifier
