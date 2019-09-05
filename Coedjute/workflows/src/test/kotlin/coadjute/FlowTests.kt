@@ -1,4 +1,4 @@
-package com.template
+package coadjute
 
 import com.template.flows.Responder
 import net.corda.testing.node.MockNetwork
