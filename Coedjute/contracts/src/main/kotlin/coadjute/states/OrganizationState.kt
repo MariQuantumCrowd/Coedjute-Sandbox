@@ -12,6 +12,5 @@ import net.corda.core.identity.Party
 @BelongsToContract(OrganizationContract::class)
 data class OrganizationState (val organizationName: String,
                               val registerDate: String,
-                              val user: List<UserState>?,
                               override val linearId: UniqueIdentifier,
                               override val participants: List<Party>): LinearState

@@ -41,7 +41,6 @@ class RegisterOrganizationFlow(private val organizationName: String): FlowFuncti
         return OrganizationState(
                 organizationName = organizationName,
                 registerDate = Instant.now().toString(),
-                user = null,
                 linearId = UniqueIdentifier(),
                 participants = listOf(ourIdentity)
         )
