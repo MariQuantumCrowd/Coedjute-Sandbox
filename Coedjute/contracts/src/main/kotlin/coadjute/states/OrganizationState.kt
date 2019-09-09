@@ -6,9 +6,7 @@ import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.Party
 
-// *********
-// * State *
-// *********
+
 @BelongsToContract(OrganizationContract::class)
 data class OrganizationState (val organizationName: String,
                               val registerDate: String,

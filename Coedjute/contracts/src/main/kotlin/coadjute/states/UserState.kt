@@ -13,9 +13,7 @@ data class UserState (val name: String,
                       val role: String,
                       val phoneNumber: String,
                       val country: String,
-                      val howDidYouHearAboutUs: String,
-                      val howCanWeHelp: String,
                       val organizationId: UniqueIdentifier,
+                      val roleId: UniqueIdentifier,
                       override val linearId: UniqueIdentifier,
                       override val participants: List<Party>): LinearState
-// Comapny A

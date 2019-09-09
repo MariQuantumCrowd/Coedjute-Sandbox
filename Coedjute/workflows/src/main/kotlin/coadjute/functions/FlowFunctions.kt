@@ -1,12 +1,16 @@
 package coadjute.functions
 
 import co.paralleluniverse.fibers.Suspendable
+import coadjute.states.UserState
+import net.corda.core.contracts.StateAndRef
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.flows.CollectSignaturesFlow
 import net.corda.core.flows.FinalityFlow
 import net.corda.core.flows.FlowLogic
 import net.corda.core.flows.FlowSession
 import net.corda.core.identity.Party
+import net.corda.core.node.services.queryBy
+import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
 import net.corda.core.transactions.TransactionBuilder
 import net.corda.core.utilities.ProgressTracker
@@ -78,6 +82,12 @@ abstract class FlowFunctions : FlowLogic<SignedTransaction>()
         return UniqueIdentifier.fromString(id)
     }
 
+    fun inputUserRefUsingLinearId(id: String): StateAndRef<UserState>
+    {
+        val linearId = stringToUniqueIdentifier(id)
+        val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))
+        return serviceHub.vaultService.queryBy<UserState>(criteria = criteria).states.single()
+    }
 //    fun inputStateRefProductState(id: String): StateAndRef<ProductState> {
 //        val linearId = stringToUniqueIdentifier(id)
 //        val criteria = QueryCriteria.LinearStateQueryCriteria(linearId = listOf(linearId))

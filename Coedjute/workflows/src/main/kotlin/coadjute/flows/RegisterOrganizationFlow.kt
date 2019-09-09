@@ -16,7 +16,8 @@ import java.time.Instant
 class RegisterOrganizationFlow(private val organizationName: String): FlowFunctions()
 {
     @Suspendable
-    override fun call(): SignedTransaction {
+    override fun call(): SignedTransaction
+    {
         print("                                                  \n")
         print("**************************************************\n")
         print("*    STARTING FLOW - REGISTER ORGANIZATION FLOW    *\n")
@@ -48,7 +49,8 @@ class RegisterOrganizationFlow(private val organizationName: String): FlowFuncti
 
     private fun transaction(): TransactionBuilder {
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
-        val registerCommand = Command(OrganizationContract.Commands.Register(), outputState().participants.map { it.owningKey })
+        val registerCommand = Command(OrganizationContract.Commands.Register(), ourIdentity.owningKey)
+        println(ourIdentity.owningKey)
         val builder = TransactionBuilder(notary)
         builder.addOutputState(outputState(), ORG_ID)
         builder.addCommand(registerCommand)

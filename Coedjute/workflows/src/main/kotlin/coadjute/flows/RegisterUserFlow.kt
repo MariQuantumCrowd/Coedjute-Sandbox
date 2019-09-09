@@ -6,6 +6,7 @@ import co.paralleluniverse.fibers.Suspendable
 import coadjute.contracts.OrganizationContract
 import coadjute.contracts.OrganizationContract.Companion.ORG_ID
 import coadjute.contracts.UserContract
+import coadjute.contracts.UserContract.Companion.USER_ID
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
@@ -21,9 +22,9 @@ class RegisterUserFlow(private val Name: String,
                        private val Role: String,
                        private val PhoneNumber: String,
                        private val Country: String,
-                       private val howDidYouHearAboutUs: String,
-                       private val howCanWeHelp: String,
-                       private val organizationId: String):FlowFunctions(){
+                       private val organizationId: String,
+                       private val userOrganizationId: String): FlowFunctions()
+{
     @Suspendable
     override fun call(): SignedTransaction {
         print("                                                  \n")
@@ -58,9 +59,8 @@ class RegisterUserFlow(private val Name: String,
              role =  Role,
              phoneNumber = PhoneNumber,
              country = Country,
-             howDidYouHearAboutUs = howDidYouHearAboutUs,
-             howCanWeHelp = howCanWeHelp,
-             organizationId = UniqueIdentifier.fromString(organizationId),
+             organizationId = stringToUniqueIdentifier(organizationId),
+             roleId = stringToUniqueIdentifier(userOrganizationId),
              linearId = UniqueIdentifier(),
              participants = listOf(ourIdentity)
         )
@@ -70,7 +70,7 @@ class RegisterUserFlow(private val Name: String,
         val notary = serviceHub.networkMapCache.notaryIdentities.first()
         val registerCommand = Command(UserContract.Commands.Register(), outputState().participants.map { it.owningKey })
         val builder = TransactionBuilder(notary)
-        builder.addOutputState(outputState(), ORG_ID)
+        builder.addOutputState(outputState(), USER_ID)
         builder.addCommand(registerCommand)
         return builder
     }
